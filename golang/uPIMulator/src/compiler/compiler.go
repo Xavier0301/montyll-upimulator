@@ -1,6 +1,7 @@
 package compiler
 
 import (
+	"fmt"
 	"os/exec"
 	"path/filepath"
 	"strconv"
@@ -38,9 +39,12 @@ func (this *Compiler) Build() {
 
 	command := exec.Command("docker", "build", "-t", "bongjoonhyun/upimulator", docker_dirpath)
 
-	err := command.Run()
+	// err := command.Run()
+	output, err := command.CombinedOutput()
 
 	if err != nil {
+		// Print the real error message from the compiler
+		fmt.Printf("=== COMPILATION FAILED ===\n%s\n==========================\n", string(output))
 		panic(err)
 	}
 }
@@ -50,6 +54,14 @@ func (this *Compiler) Compile() {
 	this.CompileSdk()
 }
 
+// docker run -it --rm --platform linux/amd64 \
+//   -v /Users/xavier/Desktop/Cours/Ici/brains/uPIMulator/golang/uPIMulator:/root/uPIMulator \
+//   -w /root/uPIMulator \
+//   bongjoonhyun/upimulator \
+//   /bin/bash
+
+// "docker run --privileged --rm -v this.root_dirpath+":/root/uPIMulator bongjoonhyun/upimulator
+// python3 /root/uPIMulator/benchmark/build.py", --num_dpus 1 --num_tasklets 16
 func (this *Compiler) CompileBenchmark() {
 	command := exec.Command(
 		"docker",
@@ -67,10 +79,14 @@ func (this *Compiler) CompileBenchmark() {
 		strconv.Itoa(this.num_tasklets),
 	)
 
-	err := command.Run()
+	// err := command.Run()
+	output, err := command.CombinedOutput()
 
 	if err != nil {
+		fmt.Printf("=== BENCHMARK COMPILATION FAIL ===\n%s\n==========================\n", string(output))
 		panic(err)
+	} else {
+		fmt.Printf("=== BENCHMARK COMPILATION SUCCESS ===\n%s\n==========================\n", string(output))
 	}
 }
 
@@ -89,9 +105,12 @@ func (this *Compiler) CompileSdk() {
 		strconv.Itoa(this.num_tasklets),
 	)
 
-	err := command.Run()
+	output, err := command.CombinedOutput()
 
 	if err != nil {
+		fmt.Printf("=== SDK COMPILATION FAIL ===\n%s\n==========================\n", string(output))
 		panic(err)
+	} else {
+		fmt.Printf("=== SDK COMPILATION SUCCESS ===\n%s\n==========================\n", string(output))
 	}
 }

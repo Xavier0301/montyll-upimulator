@@ -19,12 +19,20 @@ RUN apt install -y libelf-dev
 RUN apt install -y flex
 
 # Python 3.10
-RUN apt update
-RUN apt upgrade -y
-RUN apt install -y software-properties-common
-RUN add-apt-repository ppa:deadsnakes/ppa
-RUN apt install -y python3.10
-RUN apt install -y python3-pip
+# RUN apt update
+# RUN apt upgrade -y
+# RUN apt install -y software-properties-common
+# RUN add-apt-repository ppa:deadsnakes/ppa
+# RUN apt update
+# RUN apt install -y python3.10
+# RUN apt install -y python3-pip
+RUN apt-get update && \
+    apt-get install -y software-properties-common && \
+    add-apt-repository -y ppa:deadsnakes/ppa && \
+    apt-get update && \
+    apt-get install -y python3.10 && \
+    apt-get install -y curl && \
+    curl -sS https://bootstrap.pypa.io/get-pip.py | python3.10
 
 # UPMEM LLVM
 WORKDIR /root
@@ -36,8 +44,8 @@ RUN cmake build .
 
 # UPMEM SDK
 WORKDIR /root
-RUN wget sdk-releases.upmem.com/2021.3.0/ubuntu_20.04/upmem-2021.3.0-Linux-x86_64.tar.gz
-RUN tar -zxvf upmem-2021.3.0-Linux-x86_64.tar.gz
-RUN echo "source /root/upmem-2021.3.0-Linux-x86_64/upmem_env.sh" > /root/.bashrc
+RUN wget http://sdk-releases.upmem.com/2025.1.0/ubuntu_20.04/upmem-2025.1.0-Linux-x86_64.tar.gz
+RUN tar -zxvf upmem-2025.1.0-Linux-x86_64.tar.gz
+RUN echo "source /root/upmem-2025.1.0-Linux-x86_64/upmem_env.sh" > /root/.bashrc
 
 WORKDIR /root/upmem_compiler

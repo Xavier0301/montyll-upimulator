@@ -195,17 +195,61 @@ func (this *Linker) HasResolved() bool {
 }
 
 func (this *Linker) ResolveSymbols() {
+
+	// for !this.HasResolved() {
+	// 	for unresolved_symbol, _ := range this.executable.Liveness().UnresolvedSymbols() {
+	// 		if !this.linker_script.HasLinkerConstant(unresolved_symbol) {
+	// 			for _, sdk_relocatable := range this.sdk_relocatables {
+	// 				if _, found := sdk_relocatable.Liveness().GlobalSymbols()[unresolved_symbol]; found {
+	// 					this.executable.AddSdkRelocatable(sdk_relocatable)
+	// 				}
+	// 			}
+	// 		}
+	// 	}
+	// }
+
+	// We modify this function to detect missing symbols.
+	// This is becauase we are using mutliple .c source files
+	// Leading to linker errors if all are not embedded in the "main.S" file in the end
+	// Before, the loop would execute forever. Now it errors out if a missing symbol is detected
 	this.executable.AddSdkRelocatable(this.sdk_relocatables["misc.crt0"])
 
+	providerMap := make(map[string]*kernel.Relocatable)
+	for _, sdk_relocatable := range this.sdk_relocatables {
+		for global_symbol := range sdk_relocatable.Liveness().GlobalSymbols() {
+			providerMap[global_symbol] = sdk_relocatable
+		}
+	}
+
+	// detect if we get suck
 	for !this.HasResolved() {
-		for unresolved_symbol, _ := range this.executable.Liveness().UnresolvedSymbols() {
-			if !this.linker_script.HasLinkerConstant(unresolved_symbol) {
-				for _, sdk_relocatable := range this.sdk_relocatables {
-					if _, found := sdk_relocatable.Liveness().GlobalSymbols()[unresolved_symbol]; found {
-						this.executable.AddSdkRelocatable(sdk_relocatable)
-					}
+		made_progress := false
+
+		// Get the current list of missing symbols
+		unresolved := this.executable.Liveness().UnresolvedSymbols()
+
+		for unresolved_symbol := range unresolved {
+			// Skip if the Linker Script handles it
+			if this.linker_script.HasLinkerConstant(unresolved_symbol) {
+				continue
+			}
+
+			if provider, found := providerMap[unresolved_symbol]; found {
+				this.executable.AddSdkRelocatable(provider)
+				made_progress = true
+			}
+		}
+
+		// If we still have unresolved symbols but we didn't add anything new this cycle,
+		// we are missing symbols. Stop the infinite loop.
+		if !made_progress && !this.HasResolved() {
+			var missing []string
+			for s := range this.executable.Liveness().UnresolvedSymbols() {
+				if !this.linker_script.HasLinkerConstant(s) {
+					missing = append(missing, s)
 				}
 			}
+			panic(fmt.Sprintf("Linker stuck! Undefined symbols found: %v", missing))
 		}
 	}
 }

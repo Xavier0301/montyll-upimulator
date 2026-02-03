@@ -1,3 +1,12 @@
+# Montyll on the uPIMulator cycle-level simulator
+![montyll architecture](assets/montyll-pim-illustration.png "Montyll-PiM")
+
+This code is a fork of the uPIMulator simulator ([code](https://github.com/VIA-Research/uPIMulator), [paper](https://ieeexplore.ieee.org/abstract/document/10476411?casa_token=xJg6_vva9L4AAAAA:9FYqyP8t0kZPlbrtmvUbgwUcvZnqGfhMBxryHYlH1tFxxn-BbhXd4z3OysJfe3TbeTbRbIWgjQ)).
+
+It implements the necessary changes to the great uPIMulator simulator to run Montyll ([code](https://github.com/Xavier0301/cmontyll)). We use the version of the simulator location in the folder `golang/uPIMulator/`. The `README.md` there was updated.
+
+We leave the following of this readme unchanged.
+
 # 📖 Introduction
 <img src="./assets/uPIMulator_logo.png" width="1000">
 

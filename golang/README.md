@@ -1,3 +1,16 @@
+# Montyll on the uPIMulator cycle-level simulator
+
+This code is a fork of the uPIMulator simulator ([code](https://github.com/VIA-Research/uPIMulator), [paper](https://ieeexplore.ieee.org/abstract/document/10476411?casa_token=xJg6_vva9L4AAAAA:9FYqyP8t0kZPlbrtmvUbgwUcvZnqGfhMBxryHYlH1tFxxn-BbhXd4z3OysJfe3TbeTbRbIWgjQ)).
+
+It implements the necessary changes to the great uPIMulator simulator to run Montyll ([code](https://github.com/Xavier0301/cmontyll)). We use the version of the simulator location in the folder `golang/uPIMulator/`. The `README.md` there was updated.
+
+At this end of this README.md, all the steps that were followed to add Montyll as a benchmark are listed. In particular, we add the data preparation scripts in `src/assembler/prim/tbs.go` and `src/assembler/prim/tbs_bridge.c`, making use of go-C interop to prepare the data correctly using our library `cmontyll`. The benchmark itself was added at `benchmark/TBS`. It follows the file structure of the PrIM benchmarks. An implementation that relies on the UPMEM functional simulator can be found [here](https://github.com/Xavier0301/montyll-pim).
+
+One need to clone our library `cmontyll` anywhere on the machine and modify the `src/assembler/prim/tbs_bridge.c` to point to the correct location:
+```
+git clone git@github.com:Xavier0301/cmontyll.git
+```
+
 # ⚙️ Usage
 ## Currently Supported Mode
 uPIMulator operates in an execution-driven simulation mode, enabling cycle-level performance analysis of PIM-based applications.
@@ -55,11 +68,10 @@ Detailed simulation results will be written to the standard output (`stdout`).
 
 ### Example Command
 
+To run the Thousand Brains System benchmark, which runs Montyll, do:
+
 ```bash
-cd /path/to/uPIMulator/golang/uPIMulator
-rm -rf bin
-mkdir bin
-./build/uPIMulator --root_dirpath /path/to/uPIMulator/golang/uPIMulator --bin_dirpath /path/to/uPIMulator/golang/uPIMulator/bin --benchmark VA --num_channels 1 --num_ranks_per_channel 1 --num_dpus_per_rank 1 --num_tasklets 16 --data_prep_params 1024
+./build/uPIMulator --root_dirpath /Users/xavier/Desktop/Cours/Ici/brains/uPIMulator/golang/uPIMulator --bin_dirpath /Users/xavier/Desktop/Cours/Ici/brains/uPIMulator/golang/uPIMulator/bin --benchmark TBS --num_channels 1 --num_ranks_per_channel 1 --num_dpus_per_rank 1 --num_tasklets 11
 ```
 
 # 📄 Reproducing Figures from the Paper
@@ -91,6 +103,10 @@ We offer replication manuals for Figures 5, 6, 7, 9 and 10 for brevity.
 
 ```bash
 ./uPIMulator --root_dirpath /path/to/uPIMulator/ --bin_dirpath /path/to/uPIMulator/bin --benchmark VA --num_channels 1 --num_ranks_per_channel 1 --num_dpus_per_rank 1 --num_tasklets 16 --data_prep_params 524288
+``` 
+
+```bash
+./uPIMulator --root_dirpath /Users/xavier/Desktop/Cours/Ici/brains/uPIMulator/golang/uPIMulator/ --bin_dirpath /Users/xavier/Desktop/Cours/Ici/brains/uPIMulator/golang/uPIMulator/bin --benchmark VA --num_channels 1 --num_ranks_per_channel 1 --num_dpus_per_rank 1 --num_tasklets 16 --data_prep_params 524288
 ``` 
 
 Please ensure you adhere to these configurations to accurately replicate the figures presented in the paper. 

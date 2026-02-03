@@ -51,6 +51,8 @@ func (this *Assembler) Init(command_line_parser *misc.CommandLineParser) {
 	this.assemblables["UNI"] = new(prim.Uni)
 	this.assemblables["VA"] = new(prim.Va)
 
+	this.assemblables["TBS"] = new(prim.Tbs)
+
 	if assemblable, found := this.assemblables[this.benchmark]; found {
 		assemblable.Init(command_line_parser)
 	} else {
